@@ -5,11 +5,11 @@
 ;------------------------------------------------
 GPIO_BASE			.equ	0x40000000
 NVIC_BASE			.equ	0xe0000000
-SC_BASE             .equ    0xFE000
+SC_BASE                         .equ    0xFE000
 
 RCGCGPIO			.equ	0x608
-RCGCUART            .equ    0x618
-RCGC2               .equ    0x108
+RCGCUART                        .equ    0x618
+RCGC2                           .equ    0x108
 
 GPIOHBCTL			.equ	0x06C
 GPIODIR				.equ	0x400
@@ -20,51 +20,51 @@ GPIOAMSEL			.equ	0x528
 GPIOPCTL			.equ	0x52C
 GPIOLOCK			.equ	0x520
 GPIOCR				.equ	0x524
-GPIODR8R            .equ    0x508
+GPIODR8R                        .equ    0x508
 GPIODATA			.equ	0x000
 GPIOIM				.equ	0x410
 GPIOICR				.equ	0x41C
 
-EN3					.equ	0x10C
+EN3                             .equ	0x10C
 
-GPIO_PORT_M_OFFSET  .equ    0x63000
-GPIO_PORT_G_OFFSET 	.equ 	0x26000
-GPIO_PORT_A_APB_OFFSET  .equ    0x4000
+GPIO_PORT_M_OFFSET              .equ    0x63000
+GPIO_PORT_G_OFFSET              .equ 	0x26000
+GPIO_PORT_A_APB_OFFSET          .equ    0x4000
 
-UART0_OFFSET        .equ    0xC000
-UARTCTL             .equ    0x030
-UARTIBRD            .equ    0x024
-UARTFBRD            .equ    0x028
-UARTLCRH            .equ    0x02C
-UARTFR              .equ    0x018
-UARTDR              .equ    0x000
+UART0_OFFSET                    .equ    0xC000
+UARTCTL                         .equ    0x030
+UARTIBRD                        .equ    0x024
+UARTFBRD                        .equ    0x028
+UARTLCRH                        .equ    0x02C
+UARTFR                          .equ    0x018
+UARTDR                          .equ    0x000
 
 SW_ON				.equ	0x1E ;11110
 SW_OFF				.equ	0x1D ;11101
 SW_SLOW				.equ	0x1B ;11011
-SW_FAST             .equ	0x17 ;10111
+SW_FAST                         .equ	0x17 ;10111
 SW_INIT				.equ	0x0F ;01111
 
-LED_DELAY_SLOW      .equ    0x200000
-LED_DELAY_FAST      .equ    0x70000
+LED_DELAY_SLOW                  .equ    0x200000
+LED_DELAY_FAST                  .equ    0x70000
 ;--------------------------------------------------
-            .text                           ; Program Start
-            .global RESET                   ; Define entry point
-            .align	4
-			.sect ".text"
+                .text           ; Program Start
+                .global RESET   ; Define entry point
+                .align	4
+                .sect ".text"
 
-            .global Switch_Init
-            .global Switch_Input
-			.global num_1
+                .global Switch_Init
+                .global Switch_Input
+                .global num_1
 
-			.global LED_Init
-			.global LED_On
-			.global LED_Off
+                .global LED_Init
+                .global LED_On
+                .global LED_Off
 
-			.global Blink_slow
-			.global Blink_fast
-            .global UART_Init
-            .global PRINT_LEDMODE
+                .global Blink_slow
+                .global Blink_fast
+                .global UART_Init
+                .global PRINT_LEDMODE
 ;------------------------------------------------
 ;			switch initializition
 ;------------------------------------------------
