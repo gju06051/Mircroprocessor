@@ -152,12 +152,12 @@ Switch_Init:
 
 Switch_Input:
 
-		mov r5, #GPIO_BASE
-		mov r1, #0x63000
+		mov r5, #GPIO_BASE  ;GPIO base
+		mov r1, #0x63000    ;port M offset
 		add r1, r1, r5
-		mov r5, #0x7c
-		add r1, r1, r5
-
+		mov r5, #0x7c       ;masking portM SW0~SW4 (1'b00_0111_1100)
+		add r1, r1, r5      ;LSB 2-bit is always 0
+		
 		ldr r5, [r1]
 
 DELAY:	MOVW r3,#0xffff
