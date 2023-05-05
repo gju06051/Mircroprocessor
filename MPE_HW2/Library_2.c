@@ -5,7 +5,6 @@
  *      Author: J.H.Kim
  */
 
-
 /* Don't edit any code in this file(Library.c). */
 
 #include "Library.h"
@@ -56,13 +55,13 @@ void R_GPT_Setting()
 {
     R_MSTP->MSTPCRD_b.MSTPD5 = 0U; // GPT32EHx (x=0 to 3) Module Stop State Cancel
 
-    R_PMISC->PWPR_b.B0WI = (uint8_t)0U; // PFSWE Bit Write Protection Disable
+    R_PMISC->PWPR_b.B0WI = (uint8_t)0U;  // PFSWE Bit Write Protection Disable
     R_PMISC->PWPR_b.PFSWE = (uint8_t)1U; // PmnPFS Register Write Protection Disable
 
-    R_PFS->PORT[4].PIN[3].PmnPFS_b.PMR = 1U; // GTIOC3A Pin Peripheral Function Enable
+    R_PFS->PORT[4].PIN[3].PmnPFS_b.PMR = 1U;  // GTIOC3A Pin Peripheral Function Enable
     R_PFS->PORT[4].PIN[3].PmnPFS_b.PSEL = 3U; // Port m/n Pin Function Select: GTIOC3A (GPT3 PWM Output)
 
-    R_PFS->PORT[4].PIN[15].PmnPFS_b.PMR = 1U; // GTIOC0A Pin Peripheral Function Enable
+    R_PFS->PORT[4].PIN[15].PmnPFS_b.PMR = 1U;  // GTIOC0A Pin Peripheral Function Enable
     R_PFS->PORT[4].PIN[15].PmnPFS_b.PSEL = 3U; // Port m/n Pin Function Select: GTIOC0A (GPT0 PWM Output)
 
     R_GPT0_Setting();
