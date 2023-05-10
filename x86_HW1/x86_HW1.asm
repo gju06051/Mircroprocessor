@@ -15,7 +15,6 @@ START:				; Boot loader(1st sector) starts
 	mov al, 0x01
 
 ;-----------Following code is for filling some values in the memory-------------;
-
 mem:																		
 	mov byte [ds:bx], al
 	cmp bx, 0xFF
@@ -37,7 +36,6 @@ test_end:
 ;-------------------------------------------------------------------------------;
 
 	sti						; Set interrupt
-	
     call load_sectors 		; Load rest sectors
     jmp sector_2
 

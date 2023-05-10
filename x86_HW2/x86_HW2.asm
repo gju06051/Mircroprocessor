@@ -12,9 +12,8 @@ START:				; Boot loader(1st sector) starts
     mov ds, ax		; Base address of data segment
 
 ;----------------------Write your code here------------------------
-;																  ;
 	mov ax, 0xB800
-    mov es, ax 			; memory address of printing on screen
+    mov es, ax                                  ; memory address of printing on screen
 	
     mov al, byte [MSG_test]
     mov byte [es : 80*2*0+2*0], al
@@ -28,20 +27,16 @@ START:				; Boot loader(1st sector) starts
 	mov al, byte [MSG_test+3]
     mov byte [es : 80*2*0+2*3], al
     mov byte [es : 80*2*0+2*3+1], 0x02
-;																  ;
 ;------------------------------------------------------------------
+	sti                                         ; set interrupt
+    call load_sectors 		                    ; load rest sectors
+    jmp sector_2                                ; jump to sector_2
 
-	sti						; set interrupt
-	
-    call load_sectors 		; load rest sectors
-    jmp sector_2
-
-load_sectors:			 	; read and copy the rest sectors of disk
-
-   	push es
-    xor ax, ax
-    mov es, ax									; es=0x0000
- 	mov bx, sector_2 							; es:bx, Buffer Address Pointer
+load_sectors:                                   ; read and copy the rest sectors of disk
+	push es                                     ; save es register
+    xor ax, ax                                  ; ax = 0x0000
+    mov es, ax									; es = 0x0000
+	mov bx, sector_2 							; es:bx, Buffer Address Pointer
     mov ah,2 									; Read Sector Mode
     mov al,(sector_end - sector_2)/512 + 1  	; Sectors to Read Count
     mov ch,0 									; Cylinder Number=0
@@ -50,82 +45,65 @@ load_sectors:			 	; read and copy the rest sectors of disk
     mov dl,0 									; Drive=0, A:drive
 	int 0x13 									; BIOS interrupt
 												; Services depend on ah value
-    pop es
-    ret
+    pop es                                      ; restore es register
+    ret                                         ; return to caller
 	
-MSG_test: db'test',0
+MSG_test: db'test',0                            ; define string test
 
-times   510-($-$$) db 0 		; $ : current address, $$ : start address of SECTION
-								; $-$$ means the size of source
-dw      0xAA55 					; signature bytes
-								; End of Master Boot Record(1st Sector)
+times   510-($-$$) db 0                         ; $ : current address, $$ : start address of SECTION
+												; $-$$ means the size of source
+dw      0xAA55 					                ; signature bytes
+												; End of Master Boot Record(1st Sector)
 				
-sector_2:						; Program Starts
-	cli		
-	
-	
+sector_2:                                       ; Program Starts
+	cli                                         ; clear interrupt
 ;----------------------Write your code here------------------------
-;																  ;
-;Load the address of GDT to GDTR								  ;
-;																  ;
-;------------------------------------------------------------------
-
+	lgdt [gdt_ptr]                              ; Load the address of GDT to GDTR
+;------------------------------------------------------------------	
 ;----------------------Write your code here------------------------
-;																  ;
-;Control Register 0(CR0) setting								  ;
-;																  ;
+	mov eax, cr0                                ; Control Register 0(CR0) setting
+	or eax, 0x01                                ; Set the first bit of CR0 to 1
+	mov cr0, eax                                ; Save CR0
 ;------------------------------------------------------------------
-
-	mov bx, 0x10	
-	mov ds, bx
-	mov es, bx
-	mov fs, bx
-	mov gs, bx
-	mov ss, bx
+	mov bx, 0x10                                ; Put the value of Data Segment Selector to bx
+	mov ds, bx                                  ; Put the value of bx to Data Segment Selector
+	mov es, bx                                  ; Put the value of bx to Extra Segment Selector
+	mov fs, bx                                  ; Put the value of bx to FS Segment Selector
+	mov gs, bx                                  ; Put the value of bx to GS Segment Selector
+	mov ss, bx                                  ; Put the value of bx to Stack Segment Selector
 	
-	jmp SYS_CODE_SEL_1:Protected_START	; jump Protected_START
-										; Remove prefetch queue
+	jmp SYS_CODE_SEL_1:Protected_START          ; jump Protected_START
+												; Remove prefetch queue
 ;---------------------------------------------------------------		
-Protected_START:	; Protected mode starts
-[bits 32]			; Assembly command
-					; Let NASM compiler know that this code consists of 32its
-					
-	jmp $							; jump to current address,
-									; infinite loop
-									
-									
-;----------------------Write your code here------------------------
-;																  ;
-; Store the value of Selector which indicates the domain 		  ;
-; of Video Memory on ES Register								  ;
-;																  ;
-;------------------------------------------------------------------
+Protected_START:                                ; Protected mode starts
+[bits 32]			                            ; Assembly command
+												; Let NASM compiler know that this code consists of 32its
 
+	;jmp $							            ; jump to current address,
+												; infinite loop
+
+;----------------------Write your code here------------------------
+	mov ax, VIDEO_SEL                           ; Store the value of Selector which indicates the domain
+	mov es, ax                            		; of Video Memory on ES Register
+;------------------------------------------------------------------
 	call print_protected	
 	call print_cs_Protected
-	;jmp $							; for first problem
-									; after finishing making GDT and loading it,
-									; remove the remark ';'
-									
-	
+	;jmp $							            ; for first problem
+												; after finishing making GDT and loading it,
+												; remove the remark ';'
 ;-------------------------write your code here---------------------
-; Put base address of ldt to ldtr descriptor					  ;
-; Load ldt														  ;
-; 											 					  ;
-;																  ;
+	mov ax, LDTR                                ; Put base address of ldt to ldtr descriptor
+	lldt ax                                     ; Load ldt
 ;------------------------------------------------------------------	
-
-	;jmp 0x04:LDT0_Start			; for second problem
-									; after finishing making LDT and loading it,
-									; remove the remark ';'
+	jmp 0x04:LDT0_Start                         ; for second problem
+												; after finishing making LDT and loading it,
+												; remove the remark ';'
 
 LDT0_Start:
-
 	call print_cs_LDT0_Start	
-	
-	;jmp $							; for second problem
-									; after finishing making LDT and loading it,
-									; remove the remark ';'	
+	jmp $							            ; for second problem
+												; after finishing making LDT and loading it,
+												; remove the remark ';'	
 	
 ;----------------------------------------------------------------------------	
 MSG_Protected_MODE_Test: db'Protectd Mode',0
@@ -241,30 +219,62 @@ print_cs_Protected:
 ;----------------------Global Description Table-----------------------
 ;[SECTION .data]
 ;null descriptor. gdt_ptr could be put here to save a few
-gdt:
-	dw	0			
-	dw	0			
-	db	0			
-	db	0			
-	db	0			
-	db	0			
-SYS_CODE_SEL equ	08h
+gdt:                            ; idx : 0(null descriptor), ti = 0(GDT), rpl = 0(Highest Priv)
+	dw 0                        ; limit[15:0]
+	dw 0                        ; base[15:0]
+	db 0                        ; base[23:16] 
+	db 0                        ; P, DPL[1:0], S, type[3:0]
+	db 0                        ; G, D/B, L, AVL, limit[19:16] 
+	db 0                        ; base [31:24]
+
 ;-------------------------write your code here---------------------
-;Code Segment Descriptor										  ;
-;Data Segment Descriptor										  ;
-;Video Segment Descriptor										  ;
-;LDTR descriptor (for LDT)										  ;
-;																  ;
+SYS_CODE_SEL_0 equ 08h          ; idx = 1(Code SD0), ti = 0(GDT), rpl = 0(Highest Priv) 
+	dw 0xFFFF                   ; limit[15:0]
+	dw 0x0000                   ; base[15:0]
+	db 0x00                     ; base[23:16] 
+	db 0x9A                     ; P, DPL[1:0], S, type[3:0]
+	db 0xCF                     ; G, D/B, L, AVL, limit[19:16] 
+	db 0x00                     ; base [31:24]
+
+SYS_DATA_SEL equ 10h            ; idx = 2(Data), ti = 0(GDT), rpl = 0(Highest Priv)
+	dw 0xFFFF                   ; limit[15:0]
+	dw 0x0000                   ; base[15:0]
+	db 0x00                     ; base[23:16] 
+	db 0x92                     ; P, DPL[1:0], S, type[3:0]
+	db 0xCF                     ; G, D/B, L, AVL, limit[19:16] 
+	db 0x00                     ; base [31:24]
+
+VIDEO_SEL equ 18h               ; idx = 3(Video), ti = 0(GDT), rpl = 0(Highest Priv)
+	dw 0xFFFF                   ; limit[15:0]
+	dw 0x8000                   ; base[15:0]
+	db 0x0B                     ; base[23:16] 
+	db 0x92                     ; P, DPL[1:0], S, type[3:0]
+	db 0x40                     ; G, D/B, L, AVL, limit[19:16] 
+	db 0x00                     ; base [31:24]
+
+LDTR equ 20h                    ; idx = 4(LDT), ti = 0(GDT), rpl = 0(Highest Priv)
+	dw 0xFFFF                   ; limit[15:0]
+	dw ldt                      ; base[15:0]
+	db 0x00                     ; base[23:16] 
+	db 0x82                     ; P, DPL[1:0], S, type[3:0]
+	db 0x40                     ; G, D/B, L, AVL, limit[19:16] 
+	db 0x00                     ; base [31:24]
+
+SYS_CODE_SEL_1 equ 28h          ; idx = 5(Code SD1), ti = 0(GDT), rpl = 0(Highest Priv)
+	dw 0xFFFF                   ; limit[15:0]
+	dw 0x0000                   ; base[15:0]
+	db 0x00                     ; base[23:16] 
+	db 0x9A                     ; P, DPL[1:0], S, type[3:0]
+	db 0xCF                     ; G, D/B, L, AVL, limit[19:16] 
+	db 0x00                     ; base [31:24]
 ;------------------------------------------------------------------
 
 gdt_end:
 
-gdt_ptr:
 ;----------------------Write your code here------------------------
-;																  ;
-;Calculate the base and limit of GDT							  ;
-;Store in gdt_prt memory address								  ;
-;																  ;
+gdt_ptr:
+	dw gdt_end - gdt - 1        ; top ot GDT(get_end - 1) - very bottom(gdt) / 16-bit GDT table limit
+	dd gdt                      ; store base address of GDT
 ;------------------------------------------------------------------
 
 
@@ -272,10 +282,25 @@ gdt_ptr:
 ;---------------------------Local Description Table-----------------------
 
 ;-------------------------write your code here---------------------
-;Code Segment Descriptor										  ;
-;Data Segment Descriptor										  ;
-;																  ;
+ldt:                            ; Code Segment Descriptor
+LDT_CODE_SEL_0 equ 00h           ; idx = 1(Code SD0), ti = 0(GDT), rpl = 0(Highest Priv)                            
+	dw 0xFFFF                   ; limit[15:0]
+	dw 0x0000                   ; base[15:0]
+	db 0x00                     ; base[23:16] 
+	db 0x9A                     ; P, DPL[1:0], S, type[3:0]
+	db 0xCF                     ; G, D/B, L, AVL, limit[19:16] 
+	db 0x00                     ; base [31:24]
+
+LDT_DATA_SEL_0 equ 08h          ; idx = 1(Code SD0), ti = 0(GDT), rpl = 0(Highest Priv) 
+	dw 0xFFFF                   ; limit[15:0]
+	dw 0x0000                   ; base[15:0]
+	db 0x00                     ; base[23:16] 
+	db 0x92                     ; P, DPL[1:0], S, type[3:0]
+	db 0xCF                     ; G, D/B, L, AVL, limit[19:16] 
+	db 0x00                     ; base [31:24]
 ;------------------------------------------------------------------
-			
+
+ldt_end:
+
 sector_end:
 
