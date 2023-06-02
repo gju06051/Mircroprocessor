@@ -1,0 +1,41 @@
+
+A 0x41 -> 10
+B 0x42 -> 11
+C 0x43 -> 12
+D 0x44 -> 13
+E 0x45 -> 14
+F 0x46 -> 15
+
+
+Write Protection1   30630959
+Write Protection2   30730E9D
+
+Amdin   31040F0F
+Root    3174F0F0
+
+LED
+LED1    10100000
+LED2    10200000
+
+DC Motor
+ON      13100000
+OFF     13200000
+DUTY    13330xxx
+CW      134300CW    /
+CCW     13530CCW    /
+
+Servo
+0       14100000
+90      14200000
+180     14300000 
++10     14430P10    /
+-10     14530M10    /
+
+DAC
+S1      16100000
+S2      16200000
+
+Timer
+Count   1714xxxx    /
+ADC     1724xxxx    /
+

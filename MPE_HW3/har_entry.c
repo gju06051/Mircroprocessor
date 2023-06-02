@@ -169,7 +169,6 @@ void user_uart_callback(uart_callback_args_t *p_args)
                 break;
             default:
                 // If Receive data Register is charged, take some data in byte.
-
                 if ((48 <= p_args->data) & (p_args->data <= 57))
                 {
                     data[uart_idx++] = (char)(p_args->data - 15);
