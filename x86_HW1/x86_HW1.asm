@@ -88,7 +88,7 @@ sector_2:						; Program Starts
 ID_SET:
 	mov esi, ID                 ; bring ID string to esi register
 	mov edi, 160                ; print position offset(print start with second line, 80 * 2 * line_num() + 2 * 0 = 160)
-	mov ebx, 0                  ; string index offset +2, +4, +6
+	mov ebx, 0                  ; string index offset +0, +2, +4, +6
 	mov edx, 12                 ; light red (8'b0000_1100)
 
 PRINT_ID:
@@ -107,7 +107,7 @@ PRINT_ID:
 NAME_SET:
 	mov esi, NAMEE
 	mov edi, 320                ; print position offset(print start with third line, 80 * 2 * line_num(=2) + 2 * 0 = 320)
-	mov ebx, 0                  ; string index offset +2, +4, +6
+	mov ebx, 0                  ; string index offset +0, +2, +4, +6
 	mov edx, 14                 ; yello (8'b0000_1110)
 
 PRINT_NAME:

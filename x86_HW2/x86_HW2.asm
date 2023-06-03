@@ -57,14 +57,13 @@ dw      0xAA55 					                ; signature bytes
 				
 sector_2:                                       ; Program Starts
 	cli                                         ; clear interrupt
-;----------------------Write your code here------------------------
+	
 	lgdt [gdt_ptr]                              ; Load the address of GDT to GDTR
-;------------------------------------------------------------------	
-;----------------------Write your code here------------------------
+	
 	mov eax, cr0                                ; Control Register 0(CR0) setting
 	or eax, 0x01                                ; Set the first bit of CR0 to 1
 	mov cr0, eax                                ; Save CR0
-;------------------------------------------------------------------
+	
 	mov bx, 0x10                                ; Put the value of Data Segment Selector to bx
 	mov ds, bx                                  ; Put the value of bx to Data Segment Selector
 	mov es, bx                                  ; Put the value of bx to Extra Segment Selector
@@ -217,8 +216,6 @@ print_cs_Protected:
 ;----------------------------------------------------------------------------		
 	
 ;----------------------Global Description Table-----------------------
-;[SECTION .data]
-;null descriptor. gdt_ptr could be put here to save a few
 gdt:                            ; idx : 0(null descriptor), ti = 0(GDT), rpl = 0(Highest Priv)
 	dw 0                        ; limit[15:0]
 	dw 0                        ; base[15:0]
@@ -226,8 +223,7 @@ gdt:                            ; idx : 0(null descriptor), ti = 0(GDT), rpl = 0
 	db 0                        ; P, DPL[1:0], S, type[3:0]
 	db 0                        ; G, D/B, L, AVL, limit[19:16] 
 	db 0                        ; base [31:24]
-
-;-------------------------write your code here---------------------
+	
 SYS_CODE_SEL_0 equ 08h          ; idx = 1(Code SD0), ti = 0(GDT), rpl = 0(Highest Priv) 
 	dw 0xFFFF                   ; limit[15:0]
 	dw 0x0000                   ; base[15:0]
